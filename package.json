@@ -1,0 +1,36 @@
+{
+  "name": "eth-campaign",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha",
+    "dev": "next dev -p 3001"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.2",
+    "@mui/material": "^6.4.2",
+    "@mui/styled-engine-sc": "^6.4.2",
+    "@truffle/hdwallet-provider": "^1.7.0",
+    "dotenv": "^16.4.7",
+    "fs-extra": "^11.2.0",
+    "mocha": "^11.0.1",
+    "next": "^15.1.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "solc": "^0.8.28",
+    "styled-components": "^6.1.14",
+    "web3": "^4.16.0"
+  },
+  "devDependencies": {
+    "ganache": "^6.4.5"
+  }
+}
