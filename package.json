@@ -8,7 +8,9 @@
   },
   "scripts": {
     "test": "mocha",
-    "dev": "next dev -p 3001"
+    "build": "next build",
+    "dev": "next dev -p 3001",
+    "start": "next start -p 3001"
   },
   "keywords": [],
   "author": "",
