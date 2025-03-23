@@ -7,7 +7,6 @@ import {
     Box,
     Button,
     Container,
-    CircularProgress,
     InputAdornment,
     TextField,
     Typography,

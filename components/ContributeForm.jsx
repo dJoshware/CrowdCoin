@@ -13,7 +13,7 @@ import {
 import Campaign from '../backend/campaign';
 import web3 from '../backend/web3';
 
-export default function ContributeForm({ address }) {
+export default function ContributeForm({ address, onContribute }) {
     const [amount, setAmount] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -28,9 +28,9 @@ export default function ContributeForm({ address }) {
 
             setMinimumContribution(minContribution);
         };
-
-        fetchData();
         
+        fetchData();
+
         if (amount !== "" && amount < web3.utils.fromWei(minimumContribution, 'ether')) {
             setError("Amount is too low.");
         } else {
@@ -63,6 +63,7 @@ export default function ContributeForm({ address }) {
 
         setLoading(false);
         setAmount("");
+        onContribute();
         router.refresh();
     };
 

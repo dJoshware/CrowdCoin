@@ -6,7 +6,6 @@ import {
     Alert,
     Box,
     Button,
-    CircularProgress,
     Container,
     InputAdornment,
     TextField,
@@ -72,7 +71,7 @@ export default function RequestNew() {
             return;
         }
         const summary = await _campaign.methods.getSummary().call();
-        if (web3.utils.toWei(amount, 'ether') > web3.utils.toWei(summary[1], 'ether')) {
+        if (web3.utils.toWei(amount, 'ether') > Number(summary[1])) {
             setError("Amount cannot be greater than campaign balance.");
             return;
         }

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
     Button,
     Paper,
@@ -24,48 +23,112 @@ export default function RequestTable(props) {
 
     const [account, setAccount] = useState("");
     const [manager, setManager] = useState("");
+    const [requests, setRequests] = useState([]);
+    const [requestCount, setRequestCount] = useState(0);
+    const [contributorCount, setContributorCount] = useState(0);
     const [isContributor, setIsContributor] = useState(false);
     const [hasApproved, setHasApproved] = useState({});
 
     useEffect(() => {
-        const fetchData = async () => {
-            const _campaign = Campaign(props.campaign);
-            const accounts = await web3.eth.getAccounts();
-            const manager = await _campaign.methods.manager().call();
-            const _isContributor = await _campaign.methods.isContributor(accounts[0]).call();
+        // const fetchData = async selectedAccount => {
+        //     const _campaign = Campaign(props.campaign);
+        //     // const accounts = await web3.eth.getAccounts();
+        //     const manager = await _campaign.methods.manager().call();
+        //     const requestCount = await _campaign.methods.getRequestsCount().call();
+        //     const contributorCount = await _campaign.methods.contributorCount().call();
+        //     const isContributor = await _campaign.methods.isContributor(selectedAccount).call();
 
-            setAccount(accounts[0]);
-            setManager(manager);
-            setIsContributor(_isContributor);
+        //     const BATCH_SIZE = 10;
+        //     const fetchedRequests = [];
+        //     for (let i = 0; i < Number(requestCount); i += BATCH_SIZE) {
+        //         const batch = await Promise.all(
+        //             Array.from(
+        //                 { length: Math.min(BATCH_SIZE, Number(requestCount) - i) },
+        //                 (_, index) => _campaign.methods.requests(i + index).call()
+        //             )
+        //         );
+        //         fetchedRequests.push(...batch);
+        //     }
+
+        //     const approvals = {};
+        //     for (let i = 0; i < fetchedRequests.length; i++) {
+        //         approvals[i] = await getHasApproved(selectedAccount, i);
+        //     }
+
+        //     setAccount(selectedAccount);
+        //     setManager(manager);
+        //     setRequests(fetchedRequests);
+        //     setRequestCount(Number(requestCount));
+        //     setContributorCount(Number(contributorCount));
+        //     setIsContributor(isContributor);
+        //     setHasApproved(approvals);
+        // };
+
+        const initialize = async () => {
+            const accounts = await web3.eth.getAccounts();
+            if (accounts.length > 0) {
+                await fetchData(accounts[0]);
+            }
         };
-        fetchData();
+
+        const handleAccountChange = async newAccounts => {
+            if (newAccounts.length > 0) {
+                await fetchData(newAccounts[0]);
+            }
+            reloadWindow(true);
+        };
+
+        initialize();
 
         // Listen for MetaMask account change
-        window.ethereum?.on("accountsChanged", (newAccount) => {
-            setAccount(newAccount[0]);
-            router.refresh();
-        });
+        window.ethereum?.on("accountsChanged", handleAccountChange);
 
         // Cleanup event listener on unmount
         return () => {
-            window.ethereum?.removeListener("accountsChanged", () => {});
+            window.ethereum?.removeListener("accountsChanged", handleAccountChange);
         };
-    }, []);
+    }, [props.campaign, account]);
 
-    useEffect(() => {
-        if (!account) return;
+    const fetchData = async selectedAccount => {
+        const _campaign = Campaign(props.campaign);
+        // const accounts = await web3.eth.getAccounts();
+        const manager = await _campaign.methods.manager().call();
+        const requestCount = await _campaign.methods.getRequestsCount().call();
+        const contributorCount = await _campaign.methods.contributorCount().call();
+        const isContributor = await _campaign.methods.isContributor(selectedAccount).call();
 
-        const fetchApprovals = async () => {
-            const approvals = {};
-            for (let i = 0; i < props.requests.length; i++) {
-                approvals[i] = await getHasApproved(account, i);
-            }
-            setHasApproved(approvals);
-        };
-        fetchApprovals();
-    }, [account]);
+        const BATCH_SIZE = 10;
+        const fetchedRequests = [];
+        for (let i = 0; i < Number(requestCount); i += BATCH_SIZE) {
+            const batch = await Promise.all(
+                Array.from(
+                    { length: Math.min(BATCH_SIZE, Number(requestCount) - i) },
+                    (_, index) => _campaign.methods.requests(i + index).call()
+                )
+            );
+            fetchedRequests.push(...batch);
+        }
 
-    const router = useRouter();
+        const approvals = {};
+        for (let i = 0; i < fetchedRequests.length; i++) {
+            approvals[i] = await getHasApproved(selectedAccount, i);
+        }
+
+        setAccount(selectedAccount);
+        setManager(manager);
+        setRequests(fetchedRequests);
+        setRequestCount(Number(requestCount));
+        setContributorCount(Number(contributorCount));
+        setIsContributor(isContributor);
+        setHasApproved(approvals);
+    };
+
+    const reloadWindow = shouldReload => {
+        if (shouldReload && !window.__hasReloaded__) {
+            window.__hasReloaded__ = true;
+            window.location.reload();
+        }
+    };
 
     const handleSubmit = async index => {
         // setLoading(true);
@@ -78,39 +141,38 @@ export default function RequestTable(props) {
                 await _campaign.methods.finalizeRequest(index).send({
                     from: account,
                 });
+                reloadWindow(true);
             } else {
                 await _campaign.methods.approveRequest(index).send({
                     from: account,
                 });
+                reloadWindow(true);
             }
+            await fetchData();
         } catch (err) {
             console.log(err);
             setError(err.message);
         }
         // setLoading(false);
-        setLoading(prev => ({ ...prev, [index]: true }));
-
-        router.refresh();
+        setLoading(prev => ({ ...prev, [index]: false }));
     };
 
     const getTooltipTitle = request => {
         if (manager === account) {
-            if (request.approvalCount < props.contributorCount / 2) return "Request does not have enough approvals.";
+            if (request.approvalCount < contributorCount / 2) return "Request does not have enough approvals.";
+            return "";
+        } else {
+            if (!isContributor) return "You must be a contributor to do this.";
+            return "";
         }
-        if (!isContributor) return "You must be a contributor to do this.";
-        return "";
     }
 
     const getButtonDisability = request => {
         if (manager === account) {
-            if (request.approvalCount < props.contributorCount / 2) {
-                return true;
-            }
+            return request.approvalCount < contributorCount / 2;
+        } else {
+            return !isContributor;
         }
-        if (!isContributor) {
-            return true;
-        }
-        return false;
     }
 
     const getHasApproved = async (account, index) => {
@@ -132,7 +194,7 @@ export default function RequestTable(props) {
             <Table
                 stickyHeader
                 aria-label='List of campaign requests'>
-                <caption>Found {props.requestCount} requests</caption>
+                <caption>Found {requestCount} requests</caption>
                 <TableHead>
                     <TableRow
                         sx={{
@@ -178,7 +240,7 @@ export default function RequestTable(props) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {props.requests.map((request, index) => {
+                    {requests.map((request, index) => {
                         return (
                             <TableRow
                                 key={index}
@@ -210,7 +272,7 @@ export default function RequestTable(props) {
                                 </TableCell>
                                 <TableCell align='center'>
                                     {request.approvalCount}/
-                                    {props.contributorCount}
+                                    {contributorCount}
                                 </TableCell>
                                 {request.complete ? (
                                     <TableCell
@@ -241,7 +303,7 @@ export default function RequestTable(props) {
                                                 }}>
                                                 <span>
                                                     <Button
-                                                        disabled={getButtonDisability(request)}
+                                                        disabled={getButtonDisability(request, index)}
                                                         loading={loading[index]}
                                                         loadingPosition='center'
                                                         onClick={() => handleSubmit(index)}
