@@ -1,7 +1,7 @@
 # CrowdCoin
 
 ## Description
-A dApp project based on Stephen Grider's "Ethereum and Solidity: The Complete Developer's Guide" course on Udemy. The contract is deployed to the Sepolia test network and can be found on Sepolia Etherscan [here](https://sepolia.etherscan.io/address/0x945eE41784a094B43EBD0cEADa32095FA7760304).
+A dApp project based on Stephen Grider's "Ethereum and Solidity: The Complete Developer's Guide" course on Udemy. The contract is deployed to the Sepolia test network and can be found on Sepolia Etherscan [here](https://sepolia.etherscan.io/address/0x29486a20caF307d538904b92560f580a04948D81).
 
 ---
 
