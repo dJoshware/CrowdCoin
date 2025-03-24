@@ -12,7 +12,7 @@ A dApp project based on Stephen Grider's "Ethereum and Solidity: The Complete De
 ---
 
 ## Live URL
-🚀 [CrowdCoin](http://3.91.80.82:3001/)
+🚀 [CrowdCoin](https://crowdcoin.djoshware.com)
 
 ---
 
