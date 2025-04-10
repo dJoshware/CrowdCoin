@@ -97,6 +97,7 @@ export default function RequestNew() {
         }
 
         setLoading(false);
+        setError("");
     };
 
     return (

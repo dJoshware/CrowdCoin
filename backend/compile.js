@@ -8,7 +8,7 @@ const solc = require('solc');
 const buildPath = path.resolve(__dirname, 'build');
 // Deletes 'build' directory, if exists
 fs.removeSync(buildPath);
-
+// Gets path of 'Campaign.sol' file inside 'contracts' directory
 const campaignPath = path.resolve(__dirname, 'contracts', 'Campaign.sol');
 const source = fs.readFileSync(campaignPath, 'utf-8');
 

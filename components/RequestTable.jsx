@@ -30,39 +30,6 @@ export default function RequestTable(props) {
     const [hasApproved, setHasApproved] = useState({});
 
     useEffect(() => {
-        // const fetchData = async selectedAccount => {
-        //     const _campaign = Campaign(props.campaign);
-        //     // const accounts = await web3.eth.getAccounts();
-        //     const manager = await _campaign.methods.manager().call();
-        //     const requestCount = await _campaign.methods.getRequestsCount().call();
-        //     const contributorCount = await _campaign.methods.contributorCount().call();
-        //     const isContributor = await _campaign.methods.isContributor(selectedAccount).call();
-
-        //     const BATCH_SIZE = 10;
-        //     const fetchedRequests = [];
-        //     for (let i = 0; i < Number(requestCount); i += BATCH_SIZE) {
-        //         const batch = await Promise.all(
-        //             Array.from(
-        //                 { length: Math.min(BATCH_SIZE, Number(requestCount) - i) },
-        //                 (_, index) => _campaign.methods.requests(i + index).call()
-        //             )
-        //         );
-        //         fetchedRequests.push(...batch);
-        //     }
-
-        //     const approvals = {};
-        //     for (let i = 0; i < fetchedRequests.length; i++) {
-        //         approvals[i] = await getHasApproved(selectedAccount, i);
-        //     }
-
-        //     setAccount(selectedAccount);
-        //     setManager(manager);
-        //     setRequests(fetchedRequests);
-        //     setRequestCount(Number(requestCount));
-        //     setContributorCount(Number(contributorCount));
-        //     setIsContributor(isContributor);
-        //     setHasApproved(approvals);
-        // };
 
         const initialize = async () => {
             const accounts = await web3.eth.getAccounts();
